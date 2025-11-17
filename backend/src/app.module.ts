@@ -17,6 +17,7 @@ import { TemplateModule } from './modules/template/template.module';
 import { AgentModule } from './modules/agent/agent.module';
 import { SubscriptionModule } from './modules/subscription/subscription.module';
 import { PaymentModule } from './modules/payment/payment.module';
+import { UploadModule } from './modules/upload/upload.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { PaymentModule } from './modules/payment/payment.module';
     AgentModule,
     SubscriptionModule,
     PaymentModule,
+    UploadModule,
   ],
 })
 export class AppModule {}
