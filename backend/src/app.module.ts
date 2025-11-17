@@ -9,7 +9,12 @@ import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
 import jwtConfig from './config/jwt.config';
 
-// 模块
+// 基础模块
+import { CacheModule } from './modules/cache/cache.module';
+import { QueueModule } from './modules/queue/queue.module';
+import { MonitoringModule } from './modules/monitoring/monitoring.module';
+
+// 业务模块
 import { TenantModule } from './modules/tenant/tenant.module';
 import { UserModule } from './modules/user/user.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -20,7 +25,6 @@ import { SubscriptionModule } from './modules/subscription/subscription.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { StatsModule } from './modules/stats/stats.module';
-import { MonitoringModule } from './modules/monitoring/monitoring.module';
 
 @Module({
   imports: [
@@ -50,6 +54,11 @@ import { MonitoringModule } from './modules/monitoring/monitoring.module';
     // 定时任务模块
     ScheduleModule.forRoot(),
 
+    // 基础模块
+    CacheModule,
+    QueueModule,
+    MonitoringModule,
+
     // 业务模块
     TenantModule,
     UserModule,
@@ -61,7 +70,6 @@ import { MonitoringModule } from './modules/monitoring/monitoring.module';
     PaymentModule,
     UploadModule,
     StatsModule,
-    MonitoringModule,
   ],
 })
 export class AppModule {}
