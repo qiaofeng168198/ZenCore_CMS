@@ -41,7 +41,7 @@ export function getContents(params: ContentQuery) {
 }
 
 // 获取内容详情
-export function getContent(id: number) {
+export function getContentDetail(id: number) {
   return request<Content>({
     url: `/contents/${id}`,
     method: 'get',

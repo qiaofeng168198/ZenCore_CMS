@@ -43,7 +43,7 @@ export function getMarketTemplates() {
 }
 
 // 获取模板详情
-export function getTemplate(id: number) {
+export function getTemplateDetail(id: number) {
   return request<Template>({
     url: `/templates/${id}`,
     method: 'get',
@@ -107,5 +107,21 @@ export function rateTemplate(id: number, score: number) {
     url: `/templates/${id}/rate`,
     method: 'post',
     data: { score },
+  })
+}
+
+// 安装模板
+export function installTemplate(id: number) {
+  return request({
+    url: `/templates/${id}/install`,
+    method: 'post',
+  })
+}
+
+// 卸载模板
+export function uninstallTemplate(id: number) {
+  return request({
+    url: `/templates/${id}/uninstall`,
+    method: 'post',
   })
 }

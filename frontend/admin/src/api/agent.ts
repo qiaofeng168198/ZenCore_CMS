@@ -110,3 +110,21 @@ export function getAgentTree(parentId?: number) {
     params: { parentId },
   })
 }
+
+// 获取佣金列表
+export function getCommissions(params?: any) {
+  return request({
+    url: '/agents/commissions',
+    method: 'get',
+    params,
+  })
+}
+
+// 申请提现
+export function requestWithdrawal(amount: number) {
+  return request({
+    url: '/agents/withdrawal',
+    method: 'post',
+    data: { amount },
+  })
+}
