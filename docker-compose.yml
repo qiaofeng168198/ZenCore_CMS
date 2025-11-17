@@ -119,11 +119,116 @@ services:
     networks:
       - zencore_network
 
+  # Prometheus 监控
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: zencore_prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/prometheus/alerts:/etc/prometheus/alerts
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    networks:
+      - zencore_network
+
+  # Grafana 可视化
+  grafana:
+    image: grafana/grafana:latest
+    container_name: zencore_grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+    depends_on:
+      - prometheus
+    networks:
+      - zencore_network
+
+  # AlertManager 告警管理
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: zencore_alertmanager
+    restart: unless-stopped
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./monitoring/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - alertmanager_data:/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+    networks:
+      - zencore_network
+
+  # Node Exporter 系统监控
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: zencore_node_exporter
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    networks:
+      - zencore_network
+
+  # MySQL Exporter 数据库监控
+  mysql-exporter:
+    image: prom/mysqld-exporter:latest
+    container_name: zencore_mysql_exporter
+    restart: unless-stopped
+    environment:
+      - DATA_SOURCE_NAME=${DB_USERNAME:-zencore}:${DB_PASSWORD:-zencore123}@(mysql:3306)/
+    ports:
+      - "9104:9104"
+    depends_on:
+      - mysql
+    networks:
+      - zencore_network
+
+  # Redis Exporter Redis监控
+  redis-exporter:
+    image: oliver006/redis_exporter:latest
+    container_name: zencore_redis_exporter
+    restart: unless-stopped
+    environment:
+      - REDIS_ADDR=redis:6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+    ports:
+      - "9121:9121"
+    depends_on:
+      - redis
+    networks:
+      - zencore_network
+
 volumes:
   mysql_data:
   redis_data:
   minio_data:
   nginx_logs:
+  prometheus_data:
+  grafana_data:
+  alertmanager_data:
 
 networks:
   zencore_network:

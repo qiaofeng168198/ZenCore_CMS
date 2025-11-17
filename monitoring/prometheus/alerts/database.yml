@@ -1,0 +1,75 @@
+groups:
+  - name: database_alerts
+    interval: 30s
+    rules:
+      # 数据库不可用
+      - alert: DatabaseDown
+        expr: mysql_up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "数据库不可用"
+          description: "MySQL数据库无法连接"
+
+      # 数据库连接数过高
+      - alert: HighDatabaseConnections
+        expr: mysql_global_status_threads_connected / mysql_global_variables_max_connections > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "数据库连接数过高"
+          description: "数据库连接数超过最大值的80% (当前: {{ $value | humanizePercentage }})"
+
+      # 慢查询数增加
+      - alert: SlowQueriesIncreasing
+        expr: rate(mysql_global_status_slow_queries[5m]) > 5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "慢查询数量增加"
+          description: "每秒慢查询数超过5 (当前值: {{ $value }})"
+
+      # 数据库复制延迟
+      - alert: ReplicationLag
+        expr: mysql_slave_status_seconds_behind_master > 30
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "数据库复制延迟"
+          description: "从库复制延迟超过30秒 (当前值: {{ $value }}s)"
+
+      # 死锁检测
+      - alert: DeadlockDetected
+        expr: increase(mysql_global_status_innodb_deadlocks[5m]) > 5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "检测到数据库死锁"
+          description: "5分钟内死锁次数: {{ $value }}"
+
+      # InnoDB缓冲池命中率低
+      - alert: LowBufferPoolHitRate
+        expr: |
+          (mysql_global_status_innodb_buffer_pool_read_requests - mysql_global_status_innodb_buffer_pool_reads)
+          / mysql_global_status_innodb_buffer_pool_read_requests < 0.95
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "InnoDB缓冲池命中率低"
+          description: "缓冲池命中率低于95% (当前值: {{ $value | humanizePercentage }})"
+
+      # 表锁等待
+      - alert: TableLockWaits
+        expr: rate(mysql_global_status_table_locks_waited[5m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "表锁等待频繁"
+          description: "每秒表锁等待次数: {{ $value }}"

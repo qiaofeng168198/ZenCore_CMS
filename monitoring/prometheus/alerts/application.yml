@@ -1,0 +1,83 @@
+groups:
+  - name: application_alerts
+    interval: 30s
+    rules:
+      # 应用响应时间告警
+      - alert: HighResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_ms_bucket[5m])) > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "应用响应时间过高"
+          description: "95分位响应时间超过1秒持续5分钟 (当前值: {{ $value }}ms)"
+
+      # 错误率告警
+      - alert: HighErrorRate
+        expr: sum(rate(http_requests_total{status_code=~"5.."}[5m])) / sum(rate(http_requests_total[5m])) > 0.05
+        for: 3m
+        labels:
+          severity: critical
+        annotations:
+          summary: "应用错误率过高"
+          description: "5xx错误率超过5% (当前值: {{ $value | humanizePercentage }})"
+
+      # 应用不可用告警
+      - alert: ApplicationDown
+        expr: up{job="nestjs-backend"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "应用服务不可用"
+          description: "NestJS后端服务已停止响应"
+
+      # 请求量突增告警
+      - alert: RequestSpike
+        expr: rate(http_requests_total[1m]) > 2 * rate(http_requests_total[1m] offset 5m)
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "请求量异常增长"
+          description: "请求量是5分钟前的2倍以上"
+
+      # 内存使用告警
+      - alert: HighMemoryUsage
+        expr: system_memory_usage_percent > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "内存使用率过高"
+          description: "内存使用率超过85% (当前值: {{ $value }}%)"
+
+      # CPU使用告警
+      - alert: HighCPUUsage
+        expr: system_cpu_usage_percent > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "CPU使用率过高"
+          description: "CPU使用率超过80% (当前值: {{ $value }}%)"
+
+      # 磁盘使用告警
+      - alert: HighDiskUsage
+        expr: system_disk_usage_percent > 85
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "磁盘使用率过高"
+          description: "磁盘使用率超过85% (当前值: {{ $value }}%)"
+
+      # 慢查询告警
+      - alert: SlowQueries
+        expr: histogram_quantile(0.99, rate(http_request_duration_ms_bucket[5m])) > 5000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "存在慢查询"
+          description: "99分位响应时间超过5秒 (当前值: {{ $value }}ms)"

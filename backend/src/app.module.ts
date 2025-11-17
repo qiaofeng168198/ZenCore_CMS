@@ -20,6 +20,7 @@ import { SubscriptionModule } from './modules/subscription/subscription.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { StatsModule } from './modules/stats/stats.module';
+import { MonitoringModule } from './modules/monitoring/monitoring.module';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { StatsModule } from './modules/stats/stats.module';
     PaymentModule,
     UploadModule,
     StatsModule,
+    MonitoringModule,
   ],
 })
 export class AppModule {}

@@ -1,0 +1,98 @@
+global:
+  resolve_timeout: 5m
+  smtp_from: 'alerts@zencore.com'
+  smtp_smarthost: 'smtp.example.com:587'
+  smtp_auth_username: 'alerts@zencore.com'
+  smtp_auth_password: 'your-password'
+  smtp_require_tls: true
+
+# 告警路由
+route:
+  group_by: ['alertname', 'cluster', 'service']
+  group_wait: 10s
+  group_interval: 10s
+  repeat_interval: 12h
+  receiver: 'default'
+
+  routes:
+    # 紧急告警立即发送
+    - match:
+        severity: critical
+      receiver: 'critical-alerts'
+      group_wait: 0s
+      continue: true
+
+    # 数据库告警
+    - match_re:
+        alertname: ^Database.*
+      receiver: 'database-team'
+
+    # 应用告警
+    - match_re:
+        alertname: ^Application.*
+      receiver: 'dev-team'
+
+# 抑制规则
+inhibit_rules:
+  # 如果应用宕机，抑制所有其他应用相关告警
+  - source_match:
+      alertname: 'ApplicationDown'
+    target_match_re:
+      alertname: '^(HighResponseTime|HighErrorRate|RequestSpike)$'
+    equal: ['instance']
+
+  # 如果数据库宕机，抑制数据库相关告警
+  - source_match:
+      alertname: 'DatabaseDown'
+    target_match_re:
+      alertname: '^(HighDatabaseConnections|SlowQueries)$'
+    equal: ['instance']
+
+# 接收器配置
+receivers:
+  - name: 'default'
+    email_configs:
+      - to: 'ops@zencore.com'
+        headers:
+          Subject: '[告警] {{ .GroupLabels.alertname }}'
+        html: |
+          <!DOCTYPE html>
+          <html>
+          <body>
+            <h2>告警通知</h2>
+            <table border="1" cellpadding="5">
+              {{ range .Alerts }}
+              <tr><td>告警名称</td><td>{{ .Labels.alertname }}</td></tr>
+              <tr><td>严重程度</td><td>{{ .Labels.severity }}</td></tr>
+              <tr><td>描述</td><td>{{ .Annotations.description }}</td></tr>
+              <tr><td>时间</td><td>{{ .StartsAt.Format "2006-01-02 15:04:05" }}</td></tr>
+              {{ end }}
+            </table>
+          </body>
+          </html>
+
+  - name: 'critical-alerts'
+    email_configs:
+      - to: 'ops@zencore.com,manager@zencore.com'
+        headers:
+          Subject: '[紧急告警] {{ .GroupLabels.alertname }}'
+        send_resolved: true
+    webhook_configs:
+      - url: 'http://backend:3000/monitoring/webhook/alert'
+        send_resolved: true
+
+  - name: 'database-team'
+    email_configs:
+      - to: 'dba@zencore.com'
+        headers:
+          Subject: '[数据库告警] {{ .GroupLabels.alertname }}'
+
+  - name: 'dev-team'
+    email_configs:
+      - to: 'dev@zencore.com'
+        headers:
+          Subject: '[应用告警] {{ .GroupLabels.alertname }}'
+
+# 告警模板
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
