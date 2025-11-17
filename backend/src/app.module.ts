@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { ScheduleModule } from '@nestjs/schedule';
 
 // 配置
 import appConfig from './config/app.config';
@@ -18,6 +19,7 @@ import { AgentModule } from './modules/agent/agent.module';
 import { SubscriptionModule } from './modules/subscription/subscription.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { UploadModule } from './modules/upload/upload.module';
+import { StatsModule } from './modules/stats/stats.module';
 
 @Module({
   imports: [
@@ -44,6 +46,9 @@ import { UploadModule } from './modules/upload/upload.module';
       },
     ]),
 
+    // 定时任务模块
+    ScheduleModule.forRoot(),
+
     // 业务模块
     TenantModule,
     UserModule,
@@ -54,6 +59,7 @@ import { UploadModule } from './modules/upload/upload.module';
     SubscriptionModule,
     PaymentModule,
     UploadModule,
+    StatsModule,
   ],
 })
 export class AppModule {}

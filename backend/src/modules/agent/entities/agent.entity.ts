@@ -4,7 +4,11 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
 } from 'typeorm';
+import { AgentLevel } from '../dto/create-agent.dto';
 
 export enum AgentStatus {
   ACTIVE = 'active',
@@ -17,20 +21,49 @@ export class Agent {
   @PrimaryGeneratedColumn({ type: 'bigint', unsigned: true })
   id: number;
 
-  @Column({ name: 'user_id', type: 'bigint', unsigned: true, unique: true })
-  userId: number;
+  @Column({ length: 200 })
+  name: string;
+
+  @Column({ length: 50, unique: true })
+  code: string;
+
+  @Column({
+    type: 'enum',
+    enum: AgentLevel,
+    default: AgentLevel.PARTNER,
+  })
+  level: AgentLevel;
 
   @Column({ name: 'parent_id', type: 'bigint', unsigned: true, nullable: true })
   parentId: number;
 
-  @Column({ type: 'int', default: 1 })
-  level: number;
+  @ManyToOne(() => Agent, { nullable: true })
+  @JoinColumn({ name: 'parent_id' })
+  parent: Agent;
 
-  @Column({ name: 'company_name', length: 200, nullable: true })
-  companyName: string;
+  @OneToMany(() => Agent, agent => agent.parent)
+  children: Agent[];
 
-  @Column({ length: 100, nullable: true })
-  region: string;
+  @Column({ name: 'user_id', type: 'bigint', unsigned: true, nullable: true })
+  userId: number;
+
+  @Column({ name: 'contact_name', length: 100 })
+  contactName: string;
+
+  @Column({ name: 'contact_phone', length: 20 })
+  contactPhone: string;
+
+  @Column({ name: 'contact_email', length: 100, nullable: true })
+  contactEmail: string;
+
+  @Column({ name: 'region_province', length: 50, nullable: true })
+  regionProvince: string;
+
+  @Column({ name: 'region_city', length: 50, nullable: true })
+  regionCity: string;
+
+  @Column({ name: 'region_district', length: 50, nullable: true })
+  regionDistrict: string;
 
   @Column({
     type: 'enum',
@@ -53,6 +86,9 @@ export class Agent {
 
   @Column({ name: 'total_commission', type: 'decimal', precision: 15, scale: 2, default: 0 })
   totalCommission: number;
+
+  @Column({ type: 'text', nullable: true })
+  remark: string;
 
   @Column({ name: 'contract_start', type: 'date', nullable: true })
   contractStart: Date;
