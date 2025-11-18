@@ -74,25 +74,32 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { mockPerformanceStats, mockRankings } from '@/mock/data'
 
 const chartPeriod = ref('month')
 
 const stats = ref({
-  newCustomers: 12,
-  commissionIncome: 3580,
-  renewalRate: 85.5,
-  teamSize: 8
+  newCustomers: 0,
+  commissionIncome: 0,
+  renewalRate: 0,
+  teamSize: 0
 })
 
-const rankings = ref([
-  { name: '张三', newCustomers: 5, revenue: 1500, level: '金牌' },
-  { name: '李四', newCustomers: 3, revenue: 900, level: '银牌' },
-  { name: '王五', newCustomers: 2, revenue: 600, level: '铜牌' }
-])
+const rankings = ref<any[]>([])
 
 onMounted(() => {
-  // TODO: 加载数据
+  fetchData()
 })
+
+async function fetchData() {
+  try {
+    // 使用Mock数据
+    stats.value = { ...mockPerformanceStats }
+    rankings.value = [...mockRankings]
+  } catch (error) {
+    console.error('加载数据失败:', error)
+  }
+}
 
 function getLevelType(level: string) {
   const typeMap: any = {

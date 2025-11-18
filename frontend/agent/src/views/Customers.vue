@@ -105,6 +105,8 @@
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
+import { mockCustomers } from '@/mock/data'
+import { getCustomers, createCustomer, updateCustomer } from '@/api/customer'
 
 const loading = ref(false)
 const customerList = ref<any[]>([])
@@ -145,27 +147,37 @@ onMounted(() => {
 async function fetchCustomers() {
   loading.value = true
   try {
-    // TODO: 调用API获取客户列表
+    // 尝试调用真实API
     // const res = await getCustomers(queryParams.value)
     // customerList.value = res.data
     // total.value = res.total
 
-    // 模拟数据
-    customerList.value = [
-      {
-        id: 1,
-        name: '示例客户A',
-        email: 'customer-a@example.com',
-        phone: '13800138000',
-        status: 'active',
-        subscriptionPlan: '专业版',
-        monthlyRevenue: 299,
-        createdAt: '2024-01-15 10:30:00'
-      }
-    ]
-    total.value = 1
+    // 使用Mock数据（开发环境）
+    let filteredData = [...mockCustomers]
+
+    // 状态筛选
+    if (queryParams.value.status) {
+      filteredData = filteredData.filter(item => item.status === queryParams.value.status)
+    }
+
+    // 关键字搜索
+    if (queryParams.value.keyword) {
+      const keyword = queryParams.value.keyword.toLowerCase()
+      filteredData = filteredData.filter(item =>
+        item.name.toLowerCase().includes(keyword) ||
+        item.email.toLowerCase().includes(keyword)
+      )
+    }
+
+    total.value = filteredData.length
+
+    // 分页
+    const start = (queryParams.value.page - 1) * queryParams.value.pageSize
+    const end = start + queryParams.value.pageSize
+    customerList.value = filteredData.slice(start, end)
   } catch (error) {
     console.error('获取客户列表失败:', error)
+    ElMessage.error('获取客户列表失败')
   } finally {
     loading.value = false
   }
@@ -207,7 +219,14 @@ async function handleSave() {
   await formRef.value.validate(async (valid) => {
     if (valid) {
       try {
-        // TODO: 调用API保存
+        // 调用API保存
+        if (customerForm.value.id) {
+          // 更新
+          // await updateCustomer(customerForm.value.id, customerForm.value)
+        } else {
+          // 新增
+          // await createCustomer(customerForm.value)
+        }
         ElMessage.success('保存成功')
         dialogVisible.value = false
         fetchCustomers()

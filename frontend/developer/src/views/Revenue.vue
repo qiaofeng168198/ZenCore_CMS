@@ -71,23 +71,30 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { mockRevenueList, mockRevenueStats } from '@/mock/data'
 
-const revenueList = ref([
-  {
-    id: 1,
-    templateName: '企业官网模板',
-    type: 'download',
-    quantity: 5,
-    price: 99,
-    amount: 495,
-    status: 'settled',
-    createdAt: '2024-11-10 14:20:00'
-  }
-])
+const revenueList = ref<any[]>([])
+
+const stats = ref({
+  totalRevenue: 0,
+  monthlyRevenue: 0,
+  withdrawn: 0,
+  pending: 0
+})
 
 onMounted(() => {
-  // TODO: 加载收益数据
+  fetchRevenueData()
 })
+
+async function fetchRevenueData() {
+  try {
+    // 使用Mock数据
+    stats.value = { ...mockRevenueStats }
+    revenueList.value = [...mockRevenueList]
+  } catch (error) {
+    console.error('加载收益数据失败:', error)
+  }
+}
 </script>
 
 <style scoped lang="scss">

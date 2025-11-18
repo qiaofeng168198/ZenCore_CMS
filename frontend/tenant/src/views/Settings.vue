@@ -107,6 +107,8 @@
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
+import { mockTenantInfo, mockQuotaInfo, mockSecuritySettings } from '@/mock/data'
+import { getTenantInfo, updateTenantInfo, getQuotaInfo, changePassword, toggle2FA, toggleLoginNotification } from '@/api/settings'
 
 const activeTab = ref('basic')
 const showPasswordDialog = ref(false)
@@ -169,16 +171,20 @@ onMounted(() => {
 
 async function fetchSettings() {
   try {
-    // TODO: 调用API获取设置信息
-    ElMessage.info('加载设置信息...')
+    // 使用Mock数据
+    basicForm.value = { ...mockTenantInfo }
+    quotaInfo.value = { ...mockQuotaInfo }
+    securitySettings.value = { ...mockSecuritySettings }
   } catch (error) {
     console.error('获取设置信息失败:', error)
+    ElMessage.error('获取设置信息失败')
   }
 }
 
 async function handleSaveBasic() {
   try {
-    // TODO: 调用API保存基本信息
+    // 调用API保存基本信息
+    // await updateTenantInfo(basicForm.value)
     ElMessage.success('保存成功')
   } catch (error) {
     ElMessage.error('保存失败')
@@ -191,7 +197,8 @@ async function handleChangePassword() {
   await passwordFormRef.value.validate(async (valid) => {
     if (valid) {
       try {
-        // TODO: 调用API修改密码
+        // 调用API修改密码
+        // await changePassword(passwordForm.value)
         ElMessage.success('密码修改成功')
         showPasswordDialog.value = false
         passwordForm.value = { oldPassword: '', newPassword: '', confirmPassword: '' }
@@ -204,7 +211,8 @@ async function handleChangePassword() {
 
 async function handleToggle2FA(value: boolean) {
   try {
-    // TODO: 调用API切换双因素认证
+    // 调用API切换双因素认证
+    // await toggle2FA(value)
     ElMessage.success(value ? '双因素认证已开启' : '双因素认证已关闭')
   } catch (error) {
     ElMessage.error('操作失败')
@@ -214,7 +222,8 @@ async function handleToggle2FA(value: boolean) {
 
 async function handleToggleLoginNotif(value: boolean) {
   try {
-    // TODO: 调用API切换登录通知
+    // 调用API切换登录通知
+    // await toggleLoginNotification(value)
     ElMessage.success(value ? '登录通知已开启' : '登录通知已关闭')
   } catch (error) {
     ElMessage.error('操作失败')

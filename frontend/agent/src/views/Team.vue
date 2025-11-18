@@ -71,34 +71,13 @@
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { FormInstance, FormRules } from 'element-plus'
+import { mockTeamMembers } from '@/mock/data'
+import { inviteTeamMember } from '@/api/customer'
 
 const inviteVisible = ref(false)
 const inviteFormRef = ref<FormInstance>()
 
-const teamMembers = ref([
-  {
-    id: 1,
-    name: '张三',
-    email: 'zhangsan@example.com',
-    phone: '13800138001',
-    role: 'leader',
-    customers: 15,
-    monthlyRevenue: 4500,
-    status: 'active',
-    joinedAt: '2024-01-10 09:00:00'
-  },
-  {
-    id: 2,
-    name: '李四',
-    email: 'lisi@example.com',
-    phone: '13800138002',
-    role: 'member',
-    customers: 10,
-    monthlyRevenue: 3000,
-    status: 'active',
-    joinedAt: '2024-02-15 10:30:00'
-  }
-])
+const teamMembers = ref<any[]>([])
 
 const inviteForm = ref({
   name: '',
@@ -118,8 +97,17 @@ const inviteRules: FormRules = {
 }
 
 onMounted(() => {
-  // TODO: 加载团队成员数据
+  fetchTeamMembers()
 })
+
+async function fetchTeamMembers() {
+  try {
+    // 使用Mock数据
+    teamMembers.value = [...mockTeamMembers]
+  } catch (error) {
+    console.error('加载团队成员失败:', error)
+  }
+}
 
 function handleInvite() {
   inviteForm.value = { name: '', email: '', phone: '', role: '' }
@@ -140,9 +128,11 @@ async function handleSendInvite() {
   await inviteFormRef.value.validate(async (valid) => {
     if (valid) {
       try {
-        // TODO: 调用API发送邀请
+        // 调用API发送邀请
+        // await inviteTeamMember(inviteForm.value)
         ElMessage.success('邀请已发送')
         inviteVisible.value = false
+        fetchTeamMembers()
       } catch (error) {
         ElMessage.error('发送失败')
       }

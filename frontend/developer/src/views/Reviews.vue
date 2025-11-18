@@ -14,7 +14,7 @@
         </div>
       </template>
 
-      <div v-for="review in reviewList" :key="review.id" class="review-item">
+      <div v-for="review in filteredReviews" :key="review.id" class="review-item">
         <div class="review-header">
           <div>
             <el-avatar :size="40" :src="review.userAvatar" />
@@ -36,43 +36,42 @@
         </div>
       </div>
 
-      <el-empty v-if="reviewList.length === 0" description="暂无评价" />
+      <el-empty v-if="filteredReviews.length === 0" description="暂无评价" />
     </el-card>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import { ElMessage } from 'element-plus'
+import { mockReviews } from '@/mock/data'
 
 const filterRating = ref('all')
 
-const reviewList = ref([
-  {
-    id: 1,
-    userName: '张三',
-    userAvatar: '',
-    rating: 5,
-    templateName: '企业官网模板',
-    comment: '非常好用的模板，设计精美，功能完善！',
-    reply: '感谢您的支持！',
-    createdAt: '2024-11-10 15:30:00'
-  },
-  {
-    id: 2,
-    userName: '李四',
-    userAvatar: '',
-    rating: 4,
-    templateName: '企业官网模板',
-    comment: '整体不错，希望能增加更多自定义选项。',
-    reply: null,
-    createdAt: '2024-11-08 10:20:00'
+const reviewList = ref<any[]>([])
+
+const filteredReviews = computed(() => {
+  if (filterRating.value === 'all') {
+    return reviewList.value
   }
-])
+  if (filterRating.value === '2') {
+    return reviewList.value.filter(r => r.rating <= 2)
+  }
+  return reviewList.value.filter(r => r.rating === parseInt(filterRating.value))
+})
 
 onMounted(() => {
-  // TODO: 加载评价数据
+  fetchReviews()
 })
+
+async function fetchReviews() {
+  try {
+    // 使用Mock数据
+    reviewList.value = [...mockReviews]
+  } catch (error) {
+    console.error('加载评价数据失败:', error)
+  }
+}
 
 function handleReply(review: any) {
   ElMessage.info('回复评价：' + review.comment)

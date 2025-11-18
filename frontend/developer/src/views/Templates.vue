@@ -58,6 +58,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
+import { mockTemplates } from '@/mock/data'
 
 const loading = ref(false)
 const templateList = ref<any[]>([])
@@ -75,23 +76,14 @@ onMounted(() => {
 async function fetchTemplates() {
   loading.value = true
   try {
-    // 模拟数据
-    templateList.value = [
-      {
-        id: 1,
-        name: '企业官网模板',
-        category: '企业',
-        version: '1.2.0',
-        downloads: 156,
-        rating: 4.5,
-        revenue: 4680,
-        status: 'published',
-        createdAt: '2024-01-10 10:00:00'
-      }
-    ]
-    total.value = 1
+    // 使用Mock数据
+    const start = (queryParams.value.page - 1) * queryParams.value.pageSize
+    const end = start + queryParams.value.pageSize
+    templateList.value = mockTemplates.slice(start, end)
+    total.value = mockTemplates.length
   } catch (error) {
     console.error('获取模板列表失败:', error)
+    ElMessage.error('获取模板列表失败')
   } finally {
     loading.value = false
   }
