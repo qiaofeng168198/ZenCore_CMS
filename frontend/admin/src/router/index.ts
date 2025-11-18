@@ -41,36 +41,6 @@ const routes: RouteRecordRaw[] = [
         name: 'Agents',
         component: () => import('@/views/super-admin/Agents.vue'),
         meta: { title: '代理商管理', icon: 'Connection', roles: ['super_admin'] }
-      },
-      {
-        path: 'contents',
-        name: 'Contents',
-        component: () => import('@/views/tenant/Contents.vue'),
-        meta: { title: '内容管理', icon: 'Document', roles: ['tenant_admin', 'tenant_user'] }
-      },
-      {
-        path: 'templates',
-        name: 'Templates',
-        component: () => import('@/views/tenant/Templates.vue'),
-        meta: { title: '模板管理', icon: 'Box', roles: ['tenant_admin'] }
-      },
-      {
-        path: 'subscription',
-        name: 'Subscription',
-        component: () => import('@/views/tenant/Subscription.vue'),
-        meta: { title: '订阅管理', icon: 'CreditCard', roles: ['tenant_admin'] }
-      },
-      {
-        path: 'agent/customers',
-        name: 'AgentCustomers',
-        component: () => import('@/views/agent/Customers.vue'),
-        meta: { title: '客户管理', icon: 'User', roles: ['agent'] }
-      },
-      {
-        path: 'agent/commission',
-        name: 'AgentCommission',
-        component: () => import('@/views/agent/Commission.vue'),
-        meta: { title: '佣金管理', icon: 'Money', roles: ['agent'] }
       }
     ]
   }

@@ -2,7 +2,7 @@
   <el-container class="main-layout">
     <el-aside width="200px" class="sidebar">
       <div class="logo">
-        <h2>ZenCore CMS</h2>
+        <h2>超级管理后台</h2>
       </div>
       <el-menu
         :default-active="activeMenu"
@@ -17,48 +17,18 @@
         </el-menu-item>
 
         <!-- 超级管理员菜单 -->
-        <template v-if="userType === 'super_admin'">
-          <el-menu-item index="/tenants">
-            <el-icon><OfficeBuilding /></el-icon>
-            <span>租户管理</span>
-          </el-menu-item>
-          <el-menu-item index="/users">
-            <el-icon><User /></el-icon>
-            <span>用户管理</span>
-          </el-menu-item>
-          <el-menu-item index="/agents">
-            <el-icon><Connection /></el-icon>
-            <span>代理商管理</span>
-          </el-menu-item>
-        </template>
-
-        <!-- 租户菜单 -->
-        <template v-if="userType === 'tenant_admin' || userType === 'tenant_user'">
-          <el-menu-item index="/contents">
-            <el-icon><Document /></el-icon>
-            <span>内容管理</span>
-          </el-menu-item>
-          <el-menu-item index="/templates" v-if="userType === 'tenant_admin'">
-            <el-icon><Box /></el-icon>
-            <span>模板管理</span>
-          </el-menu-item>
-          <el-menu-item index="/subscription" v-if="userType === 'tenant_admin'">
-            <el-icon><CreditCard /></el-icon>
-            <span>订阅管理</span>
-          </el-menu-item>
-        </template>
-
-        <!-- 代理商菜单 -->
-        <template v-if="userType === 'agent'">
-          <el-menu-item index="/agent/customers">
-            <el-icon><User /></el-icon>
-            <span>客户管理</span>
-          </el-menu-item>
-          <el-menu-item index="/agent/commission">
-            <el-icon><Money /></el-icon>
-            <span>佣金管理</span>
-          </el-menu-item>
-        </template>
+        <el-menu-item index="/tenants">
+          <el-icon><OfficeBuilding /></el-icon>
+          <span>租户管理</span>
+        </el-menu-item>
+        <el-menu-item index="/users">
+          <el-icon><User /></el-icon>
+          <span>用户管理</span>
+        </el-menu-item>
+        <el-menu-item index="/agents">
+          <el-icon><Connection /></el-icon>
+          <span>代理商管理</span>
+        </el-menu-item>
       </el-menu>
     </el-aside>
 
